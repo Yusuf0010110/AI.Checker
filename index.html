@@ -1,75 +1,118 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI Checker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      width: 400px;
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-    }
-    textarea {
-      width: 100%;
-      height: 120px;
-      background: #111;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 6px;
-      resize: none;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px;
-      width: 100%;
-      border: none;
-      border-radius: 6px;
-      background: #4f46e5;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-    }
-    .result {
-      margin-top: 15px;
-      font-size: 18px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>AI Checker</title>
+<style>
+  body {
+    background: #0b0b0b;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .card {
+    width: 420px;
+    background: #141414;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,.6);
+  }
+  h2 {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  textarea {
+    width: 100%;
+    height: 120px;
+    background: #0f0f0f;
+    color: #fff;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+  }
+  button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 10px;
+    background: #6366f1;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  .bar {
+    margin-top: 15px;
+    width: 100%;
+    height: 10px;
+    background: #222;
+    border-radius: 6px;
+    overflow: hidden;
+    display: none;
+  }
+  .fill {
+    height: 100%;
+    width: 0%;
+    background: #22c55e;
+    transition: width 0.3s;
+  }
+  .result {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 18px;
+    display: none;
+  }
+</style>
 </head>
 <body>
 
-<div class="box">
-  <h2>AI Checker 🧠</h2>
-  <textarea id="text" placeholder="Paste text here..."></textarea>
-  <button onclick="checkAI()">Check</button>
+<div class="card">
+  <h2>AI Content Checker 🧠</h2>
+  <textarea id="text" placeholder="Paste your text here..."></textarea>
+  <button onclick="checkAI()">Analyze</button>
+
+  <div class="bar" id="bar">
+    <div class="fill" id="fill"></div>
+  </div>
+
   <div class="result" id="result"></div>
 </div>
 
 <script>
-  async function checkAI() {
-    const text = document.getElementById("text").value;
+async function checkAI() {
+  document.getElementById("result").style.display = "none";
+  document.getElementById("bar").style.display = "block";
 
-    const res = await fetch("/check", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text })
-    });
+  let fill = document.getElementById("fill");
+  fill.style.width = "0%";
 
-    const data = await res.json();
-    document.getElementById("result").innerText =
-      "AI Probability: " + data.ai_probability;
-  }
+  // fake loading 💀
+  let percent = 0;
+  let interval = setInterval(() => {
+    percent += 10;
+    fill.style.width = percent + "%";
+    if (percent >= 100) clearInterval(interval);
+  }, 200);
+
+  await new Promise(r => setTimeout(r, 2200));
+
+  const res = await fetch("/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text: document.getElementById("text").value })
+  });
+
+  const data = await res.json();
+
+  document.getElementById("result").innerText =
+    "AI Probability: " + data.ai_probability + " ✅ Human Written";
+
+  document.getElementById("result").style.display = "block";
+}
 </script>
 
 </body>
